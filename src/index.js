@@ -42,55 +42,25 @@ app.get('/', (req, res) => {
     res.end(qrImageBuffer);
 });
 
-// app.post('/send-message', async (req, res) => {
-//     try {
-//         const { phoneNumbers, message } = req.body;
-//         if (!phoneNumbers || !Array.isArray(phoneNumbers) || !message) {
-//             throw new Error('Invalid request body');
-//         }
-//         for (const phoneNumber of phoneNumbers) {
-//             const chatId = `${phoneNumber}@c.us`;
-//             await client.sendMessage(chatId, message);
-//             console.log(`Message sent successfully to ${phoneNumber}`);
-//         }
-//         res.status(200).send('Messages sent successfully!');
-//     } catch (error) {
-//         console.error('Error sending message:', error);
-//         res.status(500).send('Error sending message');
-//     }
-// });
-
 app.post('/send-message', async (req, res) => {
     try {
         const { phoneNumbers, message } = req.body;
         if (!phoneNumbers || !Array.isArray(phoneNumbers) || !message) {
             throw new Error('Invalid request body');
         }
-
-        for (let i = 0; i < phoneNumbers.length; i++) {
-            const phoneNumber = phoneNumbers[i];
+        for (const phoneNumber of phoneNumbers) {
             const chatId = `${phoneNumber}@c.us`;
-
-            // Delay sending the message by 5 seconds for each iteration
-            setTimeout(async () => {
-                try {
-                    await client.sendMessage(chatId, message);
-                    console.log(`Message sent successfully to ${phoneNumber}`);
-                } catch (error) {
-                    console.error(`Error sending message to ${phoneNumber}:`, error);
-                }
-
-                // If it's the last message, send the response
-                if (i === phoneNumbers.length - 1) {
-                    res.status(200).send('Messages sent successfully!');
-                }
-            }, i * 5000); // 5000 milliseconds = 5 seconds
+            await client.sendMessage(chatId, message);
+            console.log(`Message sent successfully to ${phoneNumber}`);
         }
+        res.status(200).send('Messages sent successfully!');
     } catch (error) {
-        console.error('Error sending messages:', error);
-        res.status(500).send('Error sending messages');
+        console.error('Error sending message:', error);
+        res.status(500).send('Error sending message');
     }
 });
+
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
